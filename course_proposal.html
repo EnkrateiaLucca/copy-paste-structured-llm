@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Proposal Form</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .nav a {
+            color: #007bff;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .nav a:hover {
+            background-color: #f0f0f0;
+        }
+
+        .nav a.active {
+            background-color: #007bff;
+            color: white;
+        }
+
+        h1, h2, h3 { 
+            color: #333;
+            margin-top: 1.5em; 
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .section { 
+            border: 1px solid #eee; 
+            padding: 15px; 
+            margin-bottom: 20px; 
+            border-radius: 5px; 
+            background-color: #f9f9f9;
+        }
+
+        label { 
+            display: block; 
+            margin-top: 10px; 
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input[type="text"], 
+        input[type="number"], 
+        input[type="email"],
+        textarea, 
+        select {
+            width: 100%;
+            padding: 0.75rem;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+
+        textarea { 
+            min-height: 80px; 
+        }
+
+        .placeholder { 
+            color: #888; 
+            font-style: italic; 
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            width: 100%;
+            margin-top: 1rem;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        ul { 
+            list-style: disc; 
+            margin-left: 20px; 
+        }
+        
+        li { 
+            margin-bottom: 5px; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav">
+            <a href="index.html">Contact Form</a>
+            <a href="job.html">Job Form</a>
+            <a href="course_proposal.html" class="active">Course Proposal</a>
+        </div>
+
+        <h1>Course Proposal</h1>
+
+        <form id="courseProposalForm">
+            <button type="button" id="smart-fill" style="margin-bottom: 2rem;">Smart Fill</button>
+            <div id="status" class="status"></div>
+            <div class="section">
+                <h2 id="course-title-header">Course Title</h2>
+                <label for="course-title">Course Title:</label>
+                <input type="text" id="course-title" name="course-title" placeholder="Enter Course Title (e.g., Hands-on Reasoning LLMs: Reinforcement Learning in Practice)">
+            </div>
+
+            <div class="section">
+                <h2>Acquisitions Editor Section</h2>
+                <label for="target-role">Target Role(s):</label>
+                <input type="text" id="target-role" name="target-role" placeholder="e.g., AI/ML Engineer, Data Scientist">
+
+                <label for="course-level">Level:</label>
+                <input type="text" id="course-level" name="course-level" placeholder="e.g., Intermediate to Advanced">
+
+                <label for="required-skills">Skills Covered:</label>
+                <input type="text" id="required-skills" name="required-skills" placeholder="e.g., LLMs, Reasoning Models, Reinforcement Learning">
+            </div>
+
+            <div class="section">
+                <h2>Contacts</h2>
+                
+                <h3>Instructor 1</h3>
+                <label for="instructor-name-1">Instructor Name:</label>
+                <input type="text" id="instructor-name-1" name="instructor-name-1" placeholder="Instructor's Full Name">
+                
+                <label for="instructor-entity-1">Entity (if applicable):</label>
+                <input type="text" id="instructor-entity-1" name="instructor-entity-1" placeholder="Instructor's Company/Affiliation">
+                
+            </div>
+
+            <div class="section">
+                <h2>Timing and Scheduling</h2>
+                <label for="num-days">Number of day(s) per course:</label>
+                <input type="number" id="num-days" name="num-days" value="1" min="1">
+
+                <label for="duration-per-day">Duration per day (hours):</label>
+                <input type="number" id="duration-per-day" name="duration-per-day" value="4" min="1" max="8">
+
+                <label for="total-duration">Total Duration (hours):</label>
+                <input type="number" id="total-duration" name="total-duration" value="4" readonly> <label for="instructor-availability">Instructor's General Availability (e.g., Timezone/Times):</label>
+                <input type="text" id="instructor-availability" name="instructor-availability" placeholder="e.g., Morning PT">
+
+                <h3>Production/Editorial Use Only</h3>
+                <label for="initial-dates">Initial Dates:</label>
+                <p id="initial-dates" class="placeholder">[To be completed by Production/Editorial]</p>
+
+                <label for="slides-due-date">Presentation Slides Due Date:</label>
+                <p id="slides-due-date" class="placeholder">[To be completed by Production/Editorial - typically 4 weeks prior]</p>
+            </div>
+
+            <div class="section">
+                <h2>Course Information</h2>
+
+                <h3>Supporting Technologies</h3>
+                <label for="use-jupyterhub">Will this course use JupyterHub notebooks?</label>
+                <select id="use-jupyterhub" name="use-jupyterhub">
+                    <option value="no">No</option>
+                    <option value="yes">Yes</option>
+                </select>
+                <p id="jupyter-note" style="display:none;">Note: Instructors are responsible for sharing files for local execution.</p>
+                <script>
+                    document.getElementById('use-jupyterhub').addEventListener('change', function() {
+                        document.getElementById('jupyter-note').style.display = this.value === 'yes' ? 'block' : 'none';
+                    });
+                    // Trigger on load in case default is 'yes'
+                    if (document.getElementById('use-jupyterhub').value === 'yes') {
+                         document.getElementById('jupyter-note').style.display = 'block';
+                    }
+                </script>
+
+                <div id="notebook-urls">
+                    <h4>Notebooks (if applicable)</h4>
+                    <label for="notebook-url-1">1. Notebook Title & URL:</label>
+                    <input type="text" id="notebook-title-1" name="notebook-title-1" placeholder="Notebook 1 Title">
+                    <input type="text" id="notebook-url-1" name="notebook-url-1" placeholder="Notebook 1 URL">
+                </div>
+
+                <label for="other-tech-needs-bool">Does this course have any other specific technical needs?</label>
+                <select id="other-tech-needs-bool" name="other-tech-needs-bool">
+                    <option value="no">No</option>
+                    <option value="yes">Yes</option>
+                </select>
+
+                <label for="other-tech-needs-desc">If yes, please explain:</label>
+                <textarea id="other-tech-needs-desc" name="other-tech-needs-desc" placeholder="Explain specific technical needs here..."></textarea>
+
+                <h3>Course Registration Page Information</h3>
+                <label for="course-outcomes">Course Outcomes (List what learners will achieve):</label>
+                <textarea id="course-outcomes" name="course-outcomes" placeholder="Enter each outcome on a new line..."></textarea>
+
+                <label for="course-description">Course Description:</label>
+                <textarea id="course-description" name="course-description" placeholder="Enter the course description..."></textarea>
+
+                <label for="course-objectives">Course Objectives (List what attendees will learn/apply):</label>
+                <textarea id="course-objectives" name="course-objectives" placeholder="Enter each objective on a new line..."></textarea>
+
+                <label for="target-audience">Target Audience:</label>
+                <textarea id="target-audience" name="target-audience" placeholder="Describe the target audience (roles, goals)..."></textarea>
+
+                <label for="prerequisites">Prerequisites:</label>
+                <textarea id="prerequisites" name="prerequisites" placeholder="List necessary prior knowledge or experience..."></textarea>
+
+                <label for="course-preparation">Course Preparation:</label>
+                <textarea id="course-preparation" name="course-preparation" placeholder="List required setup, software, accounts (e.g., Access to Google Colab)..."></textarea>
+
+                <label for="course-follow-up">Course Follow-Up (Links/Resources):</label>
+                <textarea id="course-follow-up" name="course-follow-up" placeholder="List related books, links, resources for further learning..."></textarea>
+
+                <label for="related-courses-before">Related Live Courses (Before):</label>
+                <textarea id="related-courses-before" name="related-courses-before" placeholder="List courses to take before this one..."></textarea>
+
+                <label for="related-courses-after">Related Live Courses (After):</label>
+                <textarea id="related-courses-after" name="related-courses-after" placeholder="List courses to take after this one..."></textarea>
+
+                <label for="related-certification">Related Certification:</label>
+                <input type="text" id="related-certification" name="related-certification" placeholder="e.g., N/A or specific certification name">
+            </div>
+
+            <div class="section">
+                <h2>Course Schedule</h2>
+                <label for="course-schedule-details">Detailed Schedule (Day by Day, Time Blocks):</label>
+                <textarea id="course-schedule-details" name="course-schedule-details" rows="15" placeholder="Enter the detailed schedule, e.g.:&#10;Day 1 - Topic 1 (60 minutes)&#10;- Presentation: Sub-topic A&#10;- Exercise: Sub-topic B&#10;- Q&A&#10;..."></textarea>
+            </div>
+
+            <div class="section">
+                <h2>Instructor Information</h2>
+                <label for="instructor-bio">Bio:</label>
+                <textarea id="instructor-bio" name="instructor-bio" placeholder="Enter instructor biography..."></textarea>
+
+                <label for="instructor-affiliation">Company Affiliation:</label>
+                <input type="text" id="instructor-affiliation" name="instructor-affiliation" placeholder="e.g., Independent Consultant or Company Name">
+
+                <h3>Social Media / Links</h3>
+                <label for="instructor-website">Primary Website:</label>
+                <input type="text" id="instructor-website" name="instructor-website" placeholder="URL">
+
+                <label for="instructor-twitter">Twitter:</label>
+                <input type="text" id="instructor-twitter" name="instructor-twitter" placeholder="URL or Handle">
+
+                <label for="instructor-linkedin">LinkedIn:</label>
+                <input type="text" id="instructor-linkedin" name="instructor-linkedin" placeholder="URL">
+
+                <label for="instructor-github">GitHub:</label>
+                <input type="text" id="instructor-github" name="instructor-github" placeholder="URL">
+
+                <label for="instructor-youtube">YouTube:</label>
+                <input type="text" id="instructor-youtube" name="instructor-youtube" placeholder="URL">
+
+                <label for="instructor-other-links">Other Links:</label>
+                <textarea id="instructor-other-links" name="instructor-other-links" placeholder="Any other relevant links, one per line..."></textarea>
+            </div>
+
+            <button type="submit" id="submit-proposal">Submit Proposal</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('use-jupyterhub').addEventListener('change', function() {
+            document.getElementById('jupyter-note').style.display = this.value === 'yes' ? 'block' : 'none';
+        });
+
+        document.getElementById('courseProposalForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Add your form submission logic here
+            alert('Form submitted successfully!');
+        });
+
+        document.getElementById('smart-fill').addEventListener('click', async () => {
+            const button = document.getElementById('smart-fill');
+            const status = document.getElementById('status');
+            
+            // Disable button and show loading state
+            button.disabled = true;
+            button.textContent = 'Loading...';
+            status.className = 'status';
+            status.textContent = '';
+
+            try {
+                // Call the backend API
+                const response = await fetch('http://localhost:12345/get-course-proposal');
+                if (!response.ok) {
+                    throw new Error('Failed to get data from clipboard');
+                }
+
+                const data = await response.json();
+
+                // Update form fields
+                if (data.course_title) document.getElementById('course-title').value = data.course_title;
+                if (data.target_role) document.getElementById('target-role').value = data.target_role;
+                if (data.course_level) document.getElementById('course-level').value = data.course_level;
+                if (data.required_skills) document.getElementById('required-skills').value = data.required_skills;
+                if (data.instructor_name) document.getElementById('instructor-name-1').value = data.instructor_name;
+                if (data.instructor_entity) document.getElementById('instructor-entity-1').value = data.instructor_entity;
+                if (data.course_description) document.getElementById('course-description').value = data.course_description;
+                if (data.target_audience) document.getElementById('target-audience').value = data.target_audience;
+                if (data.prerequisites) document.getElementById('prerequisites').value = data.prerequisites;
+
+                // Show success message
+                status.className = 'status success';
+                status.textContent = 'Form filled successfully!';
+            } catch (error) {
+                // Show error message
+                status.className = 'status error';
+                status.textContent = 'Error: ' + error.message;
+            } finally {
+                // Reset button state
+                button.disabled = false;
+                button.textContent = 'Smart Fill';
+            }
+        });
+    </script>
+</body>
+</html>
