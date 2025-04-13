@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location Reference Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 2150px 1fr;
+            height: 100vh;
+            width: 100vw;
+        }
+        .container.sidebar-detached {
+            display: block;
+        }
+        .tracking-area {
+            position: relative;
+            background: #f0f0f0;
+            border-right: 1px solid #ccc;
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+        }
+        .tracking-area.full-width {
+            grid-column: 1 / -1;
+        }
+        .background-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            z-index: 1;
+        }
+        .coordinates-display {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-family: monospace;
+            z-index: 10;
+        }
+        .grid-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+        .grid-lines svg {
+            width: 100%;
+            height: 100%;
+        }
+        .sidebar {
+            background: #fff;
+            padding: 15px;
+            overflow-y: auto;
+            transition: transform 0.05s ease;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 2;
+            position: relative;
+            min-width: 250px;
+            max-width: 800px;
+            width: 300px; /* Set default width */
+        }
+        .resize-handle {
+            position: absolute;
+            left: -5px;
+            top: 0;
+            width: 10px;
+            height: 100%;
+            cursor: ew-resize;
+            background: transparent;
+            z-index: 3;
+        }
+        .resize-handle:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+        .sidebar.floating .resize-handle {
+            display: none;
+        }
+        .sidebar.floating {
+            position: fixed;
+            z-index: 1000;
+            width: 300px;
+            height: 80vh;
+            resize: both;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            will-change: transform;
+        }
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            cursor: move;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .sidebar-controls {
+            display: flex;
+            gap: 8px;
+        }
+        .sidebar-controls button {
+            width: auto;
+            margin: 0;
+            padding: 4px 8px;
+            background: #666;
+            font-size: 12px;
+        }
+        .sidebar.floating .sidebar-controls .detach {
+            display: none;
+        }
+        .sidebar:not(.floating) .sidebar-controls .attach {
+            display: none;
+        }
+        .point-marker {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: red;
+            border-radius: 50%;
+            transform: translate(-5px, -5px);
+            z-index: 5;
+        }
+        .points-list {
+            margin-top: 20px;
+            max-height: calc(100vh - 300px);
+            overflow-y: auto;
+        }
+        .point-item {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 8px;
+            padding: 8px;
+            background: #f5f5f5;
+            border-radius: 4px;
+        }
+        .point-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .point-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #666;
+            font-size: 14px;
+        }
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        .file-input-wrapper .file-input-button {
+            background: #666;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            text-align: center;
+            cursor: pointer;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 8px 12px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        button#removeImageBtn {
+            background: #ff4444;
+            display: none;
+        }
+        button#clearPoints {
+            background: #ff4444;
+        }
+        .controls {
+            margin-bottom: 20px;
+        }
+        input[type="color"] {
+            vertical-align: middle;
+            width: 50px;
+            height: 30px;
+            padding: 0;
+            border: none;
+            border-radius: 4px;
+        }
+        .dimensions-display {
+            margin-bottom: 15px;
+            font-family: monospace;
+        }
+        .color-picker-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="tracking-area" id="trackingArea">
+            <img id="backgroundImage" class="background-image" style="display: none;">
+            <div class="coordinates-display" id="coordinates">X: 0 | Y: 0</div>
+            <div class="grid-lines" id="gridLines"></div>
+        </div>
+        <div class="sidebar" id="sidebar">
+            <div class="resize-handle" id="resizeHandle"></div>
+            <div class="sidebar-header">
+                <h2>Location Reference Tool</h2>
+                <div class="sidebar-controls">
+                    <button class="detach" title="Detach sidebar">📑</button>
+                    <button class="attach" title="Attach sidebar">📌</button>
+                </div>
+            </div>
+            <div class="dimensions-display" id="dimensions">
+                Screen: 0 x 0<br>
+                Window: 0 x 0
+            </div>
+            <div class="controls">
+                <div class="file-input-wrapper">
+                    <div class="file-input-button">Choose Screenshot</div>
+                    <input type="file" id="imageInput" accept="image/*">
+                </div>
+                <button id="removeImageBtn">Remove Screenshot</button>
+                <div class="color-picker-container">
+                    <label for="pointColor">Point Color:</label>
+                    <input type="color" id="pointColor" value="#ff0000">
+                </div>
+            </div>
+            <h3>Recorded Points</h3>
+            <div class="points-list" id="pointsList"></div>
+            <div class="actions">
+                <button id="exportBtn">Export CSV</button>
+                <button id="clearPoints">Clear All Points</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const trackingArea = document.getElementById('trackingArea');
+            const coordinates = document.getElementById('coordinates');
+            const pointsList = document.getElementById('pointsList');
+            const clearPointsBtn = document.getElementById('clearPoints');
+            const colorPicker = document.getElementById('pointColor');
+            const dimensionsDisplay = document.getElementById('dimensions');
+            const gridLines = document.getElementById('gridLines');
+            const imageInput = document.getElementById('imageInput');
+            const backgroundImage = document.getElementById('backgroundImage');
+            const removeImageBtn = document.getElementById('removeImageBtn');
+            const exportBtn = document.getElementById('exportBtn');
+            const sidebar = document.getElementById('sidebar');
+            const resizeHandle = document.getElementById('resizeHandle');
+            
+            let points = [];
+            let pointCounter = 1;
+            let isDragging = false;
+            let isResizing = false;
+            let lastDownX = 0;
+            let containerWidth = 0;
+            let sidebarStartWidth = 0;
+
+            function initResize(e) {
+                if (sidebar.classList.contains('floating')) return;
+                
+                isResizing = true;
+                lastDownX = e.clientX;
+                containerWidth = document.querySelector('.container').offsetWidth;
+                sidebarStartWidth = sidebar.offsetWidth;
+
+                document.addEventListener('mousemove', resize);
+                document.addEventListener('mouseup', stopResize);
+                
+                // Prevent text selection while resizing
+                document.body.style.userSelect = 'none';
+            }
+
+            function resize(e) {
+                if (!isResizing) return;
+
+                const delta = lastDownX - e.clientX;
+                const newWidth = Math.max(250, Math.min(800, sidebarStartWidth + delta));
+                const sidebarRatio = newWidth / containerWidth;
+                const mainRatio = (containerWidth - newWidth) / containerWidth;
+                
+                document.querySelector('.container').style.gridTemplateColumns = `${mainRatio}fr ${sidebarRatio}fr`;
+                
+                // Redraw grid after resize
+                updateDimensions();
+            }
+
+            function stopResize() {
+                isResizing = false;
+                document.removeEventListener('mousemove', resize);
+                document.removeEventListener('mouseup', stopResize);
+                document.body.style.userSelect = '';
+            }
+
+            // Add resize event listeners
+            resizeHandle.addEventListener('mousedown', initResize);
+
+            // Modify detach/attach to handle resize functionality
+            document.querySelector('.sidebar-controls .detach').addEventListener('click', () => {
+                const rect = sidebar.getBoundingClientRect();
+                sidebar.classList.add('floating');
+                sidebar.style.top = `${rect.top}px`;
+                sidebar.style.left = `${rect.left}px`;
+                sidebar.style.width = `${rect.width}px`; // Preserve width when detaching
+                document.querySelector('.container').style.gridTemplateColumns = '1fr';
+                setTimeout(() => {
+                    updateDimensions();
+                }, 50);
+            });
+
+            document.querySelector('.sidebar-controls .attach').addEventListener('click', () => {
+                sidebar.classList.remove('floating');
+                sidebar.style.transform = '';
+                sidebar.style.top = '';
+                sidebar.style.left = '';
+                
+                // Reset to default 2150px position
+                document.querySelector('.container').style.gridTemplateColumns = '2150px 1fr';
+                
+                setTimeout(() => {
+                    updateDimensions();
+                }, 50);
+            });
+
+            // Handle image upload
+            imageInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        backgroundImage.src = event.target.result;
+                        backgroundImage.style.display = 'block';
+                        removeImageBtn.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Remove image
+            removeImageBtn.addEventListener('click', function() {
+                backgroundImage.src = '';
+                backgroundImage.style.display = 'none';
+                removeImageBtn.style.display = 'none';
+                imageInput.value = '';
+            });
+
+            // Update dimensions display
+            function updateDimensions() {
+                const screenWidth = window.screen.width;
+                const screenHeight = window.screen.height;
+                const windowWidth = window.innerWidth;
+                const windowHeight = window.innerHeight;
+                
+                dimensionsDisplay.innerHTML = `Screen: ${screenWidth} x ${screenHeight}<br>Window: ${windowWidth} x ${windowHeight}`;
+                
+                drawGridLines();
+            }
+
+            // Draw grid lines
+            function drawGridLines() {
+                const width = trackingArea.offsetWidth;
+                const height = trackingArea.offsetHeight;
+                
+                gridLines.innerHTML = '';
+                
+                const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                svg.setAttribute("width", "100%");
+                svg.setAttribute("height", "100%");
+                svg.setAttribute("preserveAspectRatio", "none");
+                svg.style.position = "absolute";
+                svg.style.top = "0";
+                svg.style.left = "0";
+                
+                const spacing = 50;
+                
+                // Calculate the number of lines needed based on container size
+                const numVerticalLines = Math.ceil(width / spacing);
+                const numHorizontalLines = Math.ceil(height / spacing);
+                
+                // Draw horizontal lines
+                for (let i = 0; i <= numHorizontalLines; i++) {
+                    const y = i * spacing;
+                    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    line.setAttribute("x1", "0");
+                    line.setAttribute("y1", y);
+                    line.setAttribute("x2", "100%");
+                    line.setAttribute("y2", y);
+                    line.setAttribute("stroke", "#ddd");
+                    line.setAttribute("stroke-width", "1");
+                    svg.appendChild(line);
+                    
+                    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                    text.setAttribute("x", "5");
+                    text.setAttribute("y", y - 5);
+                    text.setAttribute("fill", "#999");
+                    text.setAttribute("font-size", "10");
+                    text.textContent = y;
+                    svg.appendChild(text);
+                }
+                
+                // Draw vertical lines
+                for (let i = 0; i <= numVerticalLines; i++) {
+                    const x = i * spacing;
+                    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    line.setAttribute("x1", x);
+                    line.setAttribute("y1", "0");
+                    line.setAttribute("x2", x);
+                    line.setAttribute("y2", "100%");
+                    line.setAttribute("stroke", "#ddd");
+                    line.setAttribute("stroke-width", "1");
+                    svg.appendChild(line);
+                    
+                    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                    text.setAttribute("x", x + 5);
+                    text.setAttribute("y", "15");
+                    text.setAttribute("fill", "#999");
+                    text.setAttribute("font-size", "10");
+                    text.textContent = x;
+                    svg.appendChild(text);
+                }
+                
+                gridLines.appendChild(svg);
+            }
+            
+            // Update mouse coordinates
+            trackingArea.addEventListener('mousemove', function(e) {
+                const rect = trackingArea.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const screenX = e.screenX;
+                const screenY = e.screenY;
+                
+                coordinates.innerHTML = 
+                    `Area: X: ${Math.round(x)} | Y: ${Math.round(y)}<br>` +
+                    `Screen: X: ${screenX} | Y: ${screenY}`;
+            });
+            
+            // Handle clicks on tracking area
+            trackingArea.addEventListener('click', function(e) {
+                if (e.target === trackingArea || e.target === gridLines || e.target.closest('#gridLines') || e.target === backgroundImage) {
+                    const rect = trackingArea.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const screenX = e.screenX;
+                    const screenY = e.screenY;
+                    const color = colorPicker.value;
+                    
+                    // Add point to tracking area
+                    const marker = document.createElement('div');
+                    marker.className = 'point-marker';
+                    marker.id = `marker-${pointCounter}`;
+                    marker.style.left = `${x}px`;
+                    marker.style.top = `${y}px`;
+                    marker.style.background = color;
+                    trackingArea.appendChild(marker);
+                    
+                    // Add point to array
+                    points.push({
+                        id: pointCounter,
+                        x: Math.round(x),
+                        y: Math.round(y),
+                        screenX: screenX,
+                        screenY: screenY,
+                        color: color,
+                        timestamp: new Date()
+                    });
+                    
+                    updatePointsList();
+                    pointCounter++;
+                }
+            });
+            
+            // Export points to CSV
+            function exportToCSV() {
+                const csvContent = [
+                    'Index,RelativeX,RelativeY,ScreenX,ScreenY,Color,Timestamp',
+                    ...points.map(point => 
+                        `${point.id},${point.x},${point.y},${point.screenX},${point.screenY},${point.color},${point.timestamp.toISOString()}`
+                    )
+                ].join('\n');
+
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'recorded_locations.csv';
+                link.click();
+            }
+            
+            // Clear all points
+            clearPointsBtn.addEventListener('click', function() {
+                points = [];
+                pointCounter = 1;
+                const markers = document.querySelectorAll('.point-marker');
+                markers.forEach(marker => marker.remove());
+                updatePointsList();
+            });
+            
+            // Update points list
+            function updatePointsList() {
+                pointsList.innerHTML = '';
+                
+                if (points.length === 0) {
+                    pointsList.innerHTML = '<p>No points recorded yet.</p>';
+                    return;
+                }
+                
+                points.forEach(point => {
+                    const pointElement = document.createElement('div');
+                    pointElement.className = 'point-item';
+                    
+                    const colorElement = document.createElement('div');
+                    colorElement.className = 'point-color';
+                    colorElement.style.background = point.color;
+                    
+                    const infoElement = document.createElement('div');
+                    infoElement.className = 'point-info';
+                    infoElement.innerHTML = `
+                        <strong>Point ${point.id}</strong><br>
+                        Area: (${point.x}, ${point.y})<br>
+                        Screen: (${point.screenX}, ${point.screenY})<br>
+                        Time: ${point.timestamp.toLocaleTimeString()}
+                    `;
+                    
+                    const actionsElement = document.createElement('div');
+                    actionsElement.className = 'point-actions';
+                    const deleteButton = document.createElement('button');
+                    deleteButton.innerHTML = '❌';
+                    deleteButton.title = 'Delete point';
+                    deleteButton.addEventListener('click', function() {
+                        deletePoint(point.id);
+                    });
+                    actionsElement.appendChild(deleteButton);
+                    
+                    pointElement.appendChild(colorElement);
+                    pointElement.appendChild(infoElement);
+                    pointElement.appendChild(actionsElement);
+                    
+                    pointsList.appendChild(pointElement);
+                });
+            }
+            
+            // Delete point
+            function deletePoint(id) {
+                const marker = document.getElementById(`marker-${id}`);
+                if (marker) marker.remove();
+                points = points.filter(point => point.id !== id);
+                updatePointsList();
+            }
+            
+            // Export button event listener
+            exportBtn.addEventListener('click', exportToCSV);
+            
+            // Initialize
+            updateDimensions();
+            updatePointsList();
+            
+            // Update dimensions on resize
+            window.addEventListener('resize', updateDimensions);
+
+            // Make sidebar draggable
+            function dragStart(e) {
+                if (e.target.closest('.sidebar-header') && sidebar.classList.contains('floating')) {
+                    const rect = sidebar.getBoundingClientRect();
+                    initialX = e.type === 'mousedown' ? e.clientX - rect.left : e.touches[0].clientX - rect.left;
+                    initialY = e.type === 'mousedown' ? e.clientY - rect.top : e.touches[0].clientY - rect.top;
+                    isDragging = true;
+                }
+            }
+
+            function drag(e) {
+                if (isDragging) {
+                    e.preventDefault();
+                    const x = e.type === 'mousemove' ? e.clientX : e.touches[0].clientX;
+                    const y = e.type === 'mousemove' ? e.clientY : e.touches[0].clientY;
+                    
+                    sidebar.style.left = `${x - initialX}px`;
+                    sidebar.style.top = `${y - initialY}px`;
+                }
+            }
+
+            // Simplified drag event listeners
+            sidebar.addEventListener('mousedown', dragStart);
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', () => isDragging = false);
+
+            // Touch events
+            sidebar.addEventListener('touchstart', dragStart);
+            document.addEventListener('touchmove', drag);
+            document.addEventListener('touchend', () => isDragging = false);
+
+            // Prevent text selection while dragging
+            sidebar.addEventListener('selectstart', (e) => {
+                if (isDragging) e.preventDefault();
+            });
+        });
+    </script>
+</body>
+</html> 

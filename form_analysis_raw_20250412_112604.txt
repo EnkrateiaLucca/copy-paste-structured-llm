@@ -1,0 +1,14 @@
+Based on the image, I can see a "Job Info Extractor" form with several fields for collecting job-related information. I'll create a Pydantic model that represents this form:
+
+<python>
+from pydantic import BaseModel
+from typing import Optional
+
+class JobInfo(BaseModel):
+    job_title: str
+    company: str
+    location: str
+    job_description: str
+</python>
+
+This Pydantic model includes all the visible fields from the form: job title, company, location, and job description. Each field is set as a string type to match the text input fields shown in the form. The model will validate that all these required fields are present when data is submitted.

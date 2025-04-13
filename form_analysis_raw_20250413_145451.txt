@@ -1,0 +1,33 @@
+I'll create a Pydantic model based on the contact information form shown in the image.
+
+<python>
+from pydantic import BaseModel, Field, EmailStr
+from typing import Optional
+
+class ContactInformation(BaseModel):
+    name: str = Field(..., description="Full name")
+    email: EmailStr = Field(..., description="Email address")
+    address: str = Field(..., description="Physical address")
+    phone_number: Optional[str] = Field(None, description="Phone number")
+    comments: Optional[str] = Field(None, description="Additional comments")
+    
+    class Config:
+        schema_extra = {
+            "example": {
+                "name": "LucasName",
+                "email": "example@email.com",
+                "address": "123 Main St, City, Country",
+                "phone_number": "+1234567890",
+                "comments": "Additional information goes here"
+            }
+        }
+</python>
+
+The model includes all the fields visible in the form:
+- Name (marked as required with an asterisk)
+- Email (marked as required with an asterisk)
+- Address (marked as required with an asterisk)
+- Phone number (optional)
+- Comments (optional)
+
+I've used EmailStr for email validation and added descriptions and an example to make the model more usable.

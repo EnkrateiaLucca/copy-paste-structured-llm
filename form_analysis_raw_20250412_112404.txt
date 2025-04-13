@@ -1,0 +1,9 @@
+<python>
+from pydantic import BaseModel
+
+class JobInfoExtractor(BaseModel):
+    job_title: str
+    company: str
+    location: str
+    job_description: str
+</python>

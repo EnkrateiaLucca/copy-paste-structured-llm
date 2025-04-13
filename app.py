@@ -161,21 +161,6 @@ async def get_job_data():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/get-course-proposal")
-async def get_course_proposal():
-    """Get the latest clipboard content and process it for course proposal information."""
-    try:
-        # Get clipboard content
-        clipboard_text = pyperclip.paste()
-        if not clipboard_text:
-            raise HTTPException(status_code=400, detail="No text found in clipboard")
-        
-        # Process the text
-        course_info = extract_course_proposal(clipboard_text)
-        return course_info
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
 if __name__ == "__main__":
     import uvicorn
     port = int(os.getenv("PORT", 12345))
